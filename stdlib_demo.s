@@ -7,6 +7,14 @@
         .asciz  "Malloc failed to allocate space on the heap."
     fgets_failed_err_msg:
         .asciz  "Fgets failed due to an error or EoF occured while no characters were read."
+    arg_was_null_err_msg:
+        .asciz  "Argument buffer was null."       
+    ask_for_input_msg:
+        .asciz  "Please give some input (max. %d characters): "
+    your_input_msg:
+        .asciz  "Your input was: "
+    max_characters:
+        .quad   8
 
 .section .text
     .globl  main
@@ -34,13 +42,36 @@ fgets_failed:
     movb    $2, %dil
     call    exit
 
-# Reads input from user and prints it back to stdout
-echo_input_to_stdout:
+argument_buffer_was_null:
+    leaq    arg_was_null_err_msg(%rip), %rdi
+    call    puts
+    movb    $3, %dil
+    call    exit
+
+# Asks the user to give input to stdin
+ask_user_for_input:
+    pushq   %rbp
+    movq    %rsp, %rbp
+    
+    # Prepare arguments for printf
+    leaq    ask_for_input_msg(%rip), %rdi
+    movq    max_characters(%rip), %rsi
+    # Printf uses varargs -> need to specify 0 arguments in vector registers
+    xorq    %rax, %rax
+    # Ask the user for input
+    call    printf
+
+    leave
+    ret
+
+# Reads input from user from stdin
+get_input_from_stdin:
     pushq   %rbp
     movq    %rsp, %rbp
 
-    # Allocate a 64-byte buffer on the heap with malloc 
-    movq    $64, %rdi
+    # Allocate a (max_characters + 2)-byte buffer on the heap with malloc
+    movq    max_characters(%rip), %rdi
+    addq    $2, %rdi
     call    malloc
 
     # Test if malloc failed
@@ -63,14 +94,31 @@ echo_input_to_stdout:
     testq   %rax, %rax
     jz      fgets_failed
 
-    # Restore the pointer to the buff from stack
-    movq    8(%rsp), %rdi
-    # Print the input of the user back to stdout
-    call    puts
+    leave
+    ret
 
-    # Restore the pointer to the buff from stack and free the space
-    movq    8(%rsp), %rdi
-    call    free
+print_output_to_stdout:
+    pushq   %rbp
+    movq    %rsp, %rbp
+    
+    # Null-check the argument buffer
+    testq   %rdi, %rdi
+    jz      argument_buffer_was_null
+
+    # Save the argument buffer to stack
+    subq    $8, %rsp
+    pushq   %rdi
+
+    # Prepare arguments for printf
+    leaq    your_input_msg(%rip), %rdi
+    # Printf uses varargs -> need to specify 0 arguments in vector registers
+    xorq    %rax, %rax
+    # Print your_input_msg to stdout
+    call    printf
+
+    # Print the given arg buffer to stdout
+    popq    %rdi
+    call    puts
 
     leave
     ret
@@ -80,7 +128,18 @@ main:
     pushq   %rbp
     movq    %rsp, %rbp
 
-    call    echo_input_to_stdout
+    call    ask_user_for_input
+    call    get_input_from_stdin
+    # Save the returned ptr to the buffer on the stack + align stack
+    pushq   %rax
+    subq    $8, %rsp
+    # Prepare arguments for print_output_to_stdout
+    movq    %rax, %rdi
+    call    print_output_to_stdout
+
+    # Free the memory reserved on heap
+    movq    8(%rsp), %rdi
+    call    free
 
     # Return 0 from main
     xorq    %rax, %rax
