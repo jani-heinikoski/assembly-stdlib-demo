@@ -50,6 +50,7 @@ argument_buffer_was_null:
 
 # Asks the user to give input to stdin
 ask_user_for_input:
+    # Prologue
     pushq   %rbp
     movq    %rsp, %rbp
     
@@ -61,11 +62,13 @@ ask_user_for_input:
     # Ask the user for input
     call    printf
 
+    # Epilogue
     leave
     ret
 
 # Reads input from user from stdin
 get_input_from_stdin:
+    # Prologue
     pushq   %rbp
     movq    %rsp, %rbp
 
@@ -94,10 +97,12 @@ get_input_from_stdin:
     testq   %rax, %rax
     jz      fgets_failed
 
+    # Epilogue
     leave
     ret
 
 print_output_to_stdout:
+    # Prologue
     pushq   %rbp
     movq    %rsp, %rbp
     
@@ -120,6 +125,7 @@ print_output_to_stdout:
     popq    %rdi
     call    puts
 
+    # Epilogue
     leave
     ret
 
@@ -141,7 +147,7 @@ main:
     movq    8(%rsp), %rdi
     call    free
 
-    # Return 0 from main
+    # Epilogue - Return 0 from main
     xorq    %rax, %rax
     leave
     ret
