@@ -1,0 +1,16 @@
+# https://sequencediagram.org/
+
+title stdlib_demo.s
+
+main->ask_user_for_input:
+ask_user_for_input->printf:
+
+main->get_input_from_stdin:
+get_input_from_stdin->malloc:
+get_input_from_stdin->fgets:
+
+main->print_output_to_stdout:
+print_output_to_stdout->printf:
+print_output_to_stdout->puts:
+
+main->free:
