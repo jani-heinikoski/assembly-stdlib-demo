@@ -18,7 +18,7 @@
 
 .section .text
     .globl  main
-    .type	main, @function
+    .type   main, @function
     .extern puts # int puts(const char *s);
     .extern printf # int printf(const char *restrict format, ...);
     .extern fgets # char *fgets(char s[restrict .size], int size, FILE *restrict stream);
