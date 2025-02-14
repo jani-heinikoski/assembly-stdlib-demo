@@ -88,7 +88,7 @@ get_input_from_stdin:
 
     # Prepare arguments for fgets
     movq    %rax, %rdi
-    movq    $64, %rsi
+    movq    max_characters(%rip), %rsi
     movq    stdin(%rip), %rdx
     # Read input from the user using fgets
     call    fgets
