@@ -1,5 +1,5 @@
 
-# Calling functions in x86-64 assembly language
+# C standard library in x86-64 assembly language
 
 This small program is intended for educational purposes. It shows how the C standard library can be used in x86-64 assembly language. Listing of the C standard library functions used in the program:
 
