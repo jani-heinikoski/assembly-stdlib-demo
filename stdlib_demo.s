@@ -11,11 +11,12 @@
 .section .text
     .globl  main
     .type	main, @function
-    .extern puts
-    .extern fgets
-    .extern malloc
-    .extern free
-    .extern exit
+    .extern puts # int puts(const char *s);
+    .extern printf # int printf(const char *restrict format, ...);
+    .extern fgets # char *fgets(char s[restrict .size], int size, FILE *restrict stream);
+    .extern malloc # void *malloc(size_t size);
+    .extern free # void free(void *_Nullable ptr);
+    .extern exit # [[noreturn]] void exit(int status);
     .extern stdin
     .extern stdout
 
